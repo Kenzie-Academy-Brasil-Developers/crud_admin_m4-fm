@@ -1,5 +1,5 @@
 import { QueryConfig, QueryResult } from "pg";
-import { TUser, TUserResponse } from "../../interfaces/users.interface";
+import { TUserResponse } from "../../interfaces/users.interface";
 import { responseUserSchema } from "../../schemas/users.schema";
 import { client } from "../../database";
 

@@ -2,24 +2,24 @@ import { Request, Response } from "express";
 import { QueryConfig } from "pg";
 import { client } from "../../database";
 
-const deleteUsersService = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  const id: number = parseInt(req.params.id);
+const deleteUsersService = async (userId: number): Promise<void> => {
+  const id = userId;
   const queryString: string = `
-    DELETE FROM
-        users
-    WHERE
-        id = $1;
-  `;
+      UPDATE
+          users
+      SET
+          active = false
+      WHERE
+          id = $1
+      RETURNING *;
+      `;
   const queryConfig: QueryConfig = {
     text: queryString,
     values: [id],
   };
   await client.query(queryConfig);
 
-  return res.status(204).send();
+  return;
 };
 
 export default deleteUsersService;

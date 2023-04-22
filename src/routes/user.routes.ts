@@ -1,7 +1,9 @@
 import { Router } from "express";
 import {
   createUsersController,
+  deactivateUserController,
   listUsersController,
+  recoverUserController,
   retrieveUsersProfileController,
   updateUsersController,
 } from "../controllers/users.controllers";
@@ -40,21 +42,22 @@ userRoutes.patch(
   ensureBodyIsValidMiddleware(updateUserSchema),
   ensureTokenIsValidMiddleware,
   ensureUserExistsMiddleware,
+  ensureEmailNotExistsMiddleware,
   updateUsersController
-);
-
-userRoutes.put(
-  "/:id/recover",
-  ensureTokenIsValidMiddleware,
-  ensureAdminExistsMiddleware
 );
 
 userRoutes.delete(
   "/:id",
   ensureTokenIsValidMiddleware,
-  ensureAdminExistsMiddleware,
   ensureUserExistsMiddleware,
-  deleteUsersService
+  deactivateUserController
+);
+
+userRoutes.put(
+  "/:id/recover",
+  ensureTokenIsValidMiddleware,
+  ensureAdminExistsMiddleware,
+  recoverUserController
 );
 
 export default userRoutes;
