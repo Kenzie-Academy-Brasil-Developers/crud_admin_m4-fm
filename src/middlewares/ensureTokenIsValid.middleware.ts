@@ -7,21 +7,26 @@ const ensureTokenIsValidMiddleware = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  let token = req.headers.authorization;
+  let authorization = req.headers.authorization;
 
-  if (!token) {
+  if (!authorization) {
     throw new AppError("Missing Bearer Token", 401);
   }
-  token = token.split(" ")[1];
-  jwt.verify(token, process.env.SECRET_KEY!, (err: any, decoded: any) => {
-    if (err) {
-      throw new AppError(err.message, 401);
+  const token = authorization.split(" ")[1];
+
+  jwt.verify(
+    token,
+    String(process.env.SECRET_KEY),
+    (err: any, decoded: any) => {
+      if (err) {
+        throw new AppError(err.message, 401);
+      }
+      res.locals.token = {
+        id: decoded?.sub,
+        admin: decoded.admin,
+      };
     }
-    res.locals.token = {
-      id: decoded?.sub,
-      admin: decoded.admin,
-    };
-  });
+  );
 
   return next();
 };

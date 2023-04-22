@@ -1,17 +1,19 @@
 import { Request, Response } from "express";
 import listUsersService from "../services/users/listUsers.service";
-import retrieveUsersService from "../services/users/retrieveUsers.servise";
 import updateUsersService from "../services/users/updateUsers.service";
 import { TUserRequest, TUserResponse } from "../interfaces/users.interface";
-import { requestUserSchema } from "../schemas/users.schema";
+
 import createUsersService from "../services/users/createUsers.service";
+import retrieveUsersProfileService from "../services/users/retrieveUsersProfile.servise";
+import { number } from "zod";
 
 const createUsersController = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const userData: TUserRequest = requestUserSchema.parse(req.body);
-  const newUser: TUserResponse = await createUsersService(userData);
+  const payload: TUserRequest = req.body;
+
+  const newUser: TUserResponse = await createUsersService(payload);
 
   return res.status(201).json(newUser);
 };
@@ -20,16 +22,17 @@ const listUsersController = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const users = await listUsersService();
+  const users: TUserResponse[] = await listUsersService();
 
-  return res.json(users);
+  return res.status(200).json(users);
 };
 
-const retrieveUsersController = async (
+const retrieveUsersProfileController = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const user = await retrieveUsersService(res.locals.user);
+  const userId: number = res.locals.token.id;
+  const user: TUserResponse = await retrieveUsersProfileService(userId);
 
   return res.json(user);
 };
@@ -49,6 +52,6 @@ const updateUsersController = async (
 export {
   createUsersController,
   listUsersController,
-  retrieveUsersController,
+  retrieveUsersProfileController,
   updateUsersController,
 };

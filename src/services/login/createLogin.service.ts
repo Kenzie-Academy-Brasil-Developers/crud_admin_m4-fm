@@ -11,28 +11,29 @@ import * as bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 
-const createLoginService = async (
-  payload: TLoginRequest
-): Promise<TLoginResponse> => {
+const createLoginService = async (payload: TLoginRequest): Promise<string> => {
   const queryString: string = `
         SELECT
             * 
         FROM 
             users 
         WHERE 
-            email = %L;
+            email = $1;
     `;
-  const queryFormat: string = format(queryString, payload.email);
-  const queryResult: QueryResult<TUser> = await client.query(queryFormat);
-  const user = queryResult.rows[0];
 
-  if (queryResult.rowCount === 0) {
+  const queryResult: QueryResult<TUser> = await client.query(queryString, [
+    payload.email,
+  ]);
+
+  const userExist: TUser = queryResult.rows[0];
+
+  if (!userExist) {
     throw new AppError("Wrong email/password", 401);
   }
 
   const comparePassword: boolean = await bcrypt.compare(
     payload.password,
-    user.password
+    userExist.password
   );
 
   if (!comparePassword) {
@@ -41,16 +42,16 @@ const createLoginService = async (
 
   const token: string = jwt.sign(
     {
-      email: user.email,
+      email: userExist.email,
     },
     process.env.SECRET_KEY!,
     {
+      subject: userExist.id.toString(),
       expiresIn: process.env.EXPIRES_IN,
-      subject: user.id.toString(),
     }
   );
 
-  return { token };
+  return token;
 };
 
 export default createLoginService;

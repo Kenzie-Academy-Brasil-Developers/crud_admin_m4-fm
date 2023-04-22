@@ -6,8 +6,8 @@ const createLoginController = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const userData: TLoginRequest = req.body;
-  const token: TLoginResponse = await createLoginService(userData);
+  const payload: TLoginRequest = req.body;
+  const token = await createLoginService(payload);
 
   return res.status(200).json({ token });
 };

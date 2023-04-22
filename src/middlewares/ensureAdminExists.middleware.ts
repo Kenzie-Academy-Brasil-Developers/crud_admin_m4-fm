@@ -6,7 +6,7 @@ const ensureAdminExistsMiddleware = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { admin } = res.locals;
+  const admin = res.locals.token.admin;
 
   if (admin === false) {
     throw new AppError("Insufficient Permission", 403);

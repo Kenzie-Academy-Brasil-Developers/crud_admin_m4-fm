@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   createUsersController,
   listUsersController,
-  retrieveUsersController,
+  retrieveUsersProfileController,
   updateUsersController,
 } from "../controllers/users.controllers";
 import ensureEmailNotExistsMiddleware from "../middlewares/ensureEmailNotExists.middleware";
@@ -32,9 +32,7 @@ userRoutes.get(
 userRoutes.get(
   "/:profile",
   ensureTokenIsValidMiddleware,
-  ensureAdminExistsMiddleware,
-  ensureUserExistsMiddleware,
-  retrieveUsersController
+  retrieveUsersProfileController
 );
 
 userRoutes.patch(
