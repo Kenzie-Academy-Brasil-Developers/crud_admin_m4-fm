@@ -2,6 +2,7 @@ import { QueryConfig, QueryResult } from "pg";
 import { TUser, TUserResponse } from "../../interfaces/users.interface";
 import { client } from "../../database";
 import { responseUserSchema } from "../../schemas/users.schema";
+import { AppError } from "../../error";
 
 const recoverUserService = async (userId: number): Promise<TUserResponse> => {
   const id: number = userId;
@@ -13,6 +14,8 @@ const recoverUserService = async (userId: number): Promise<TUserResponse> => {
         active=true
     WHERE   
         id=$1
+    AND 
+        active = false
     RETURNING *;
     `;
   const queryConfig: QueryConfig = {
@@ -20,7 +23,13 @@ const recoverUserService = async (userId: number): Promise<TUserResponse> => {
     values: [id],
   };
   const queryResult: QueryResult<TUser> = await client.query(queryConfig);
-  return responseUserSchema.parse(queryResult.rows[0]);
+
+  const user = queryResult.rows[0];
+
+  if (!user) {
+    throw new AppError("User already active", 400);
+  }
+  return responseUserSchema.parse(user);
 };
 
 export default recoverUserService;

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
-import { QueryConfig } from "pg";
+import { QueryConfig, QueryResult } from "pg";
 import { client } from "../../database";
+import { TUser } from "../../interfaces/users.interface";
+import { AppError } from "../../error";
 
 const deleteUsersService = async (userId: number): Promise<void> => {
   const id = userId;
@@ -11,13 +13,18 @@ const deleteUsersService = async (userId: number): Promise<void> => {
           active = false
       WHERE
           id = $1
+      AND
+          active = true
       RETURNING *;
       `;
   const queryConfig: QueryConfig = {
     text: queryString,
     values: [id],
   };
-  await client.query(queryConfig);
+
+  const queryREsult: QueryResult<TUser> = await client.query(queryConfig);
+
+  const user = queryREsult.rows[0];
 
   return;
 };

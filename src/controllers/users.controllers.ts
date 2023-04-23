@@ -48,9 +48,20 @@ const updateUsersController = async (
   res: Response
 ): Promise<Response> => {
   const userData: TUserUpdated = req.body;
-  const userId: number = parseInt(req.params.id);
+  const userId: number = res.locals.token.id;
+  const id: number = parseInt(req.params.id);
 
-  const updatedUser: TUserResponse = await updateUsersService(userData, userId);
+  const userAdmin: boolean = res.locals.token.admin;
+
+  if (!userAdmin) {
+    if (userId !== id) {
+      return res.status(403).json({
+        message: "Insufficient Permission",
+      });
+    }
+  }
+
+  const updatedUser: TUserResponse = await updateUsersService(userData, id);
 
   return res.status(200).json(updatedUser);
 };
@@ -62,6 +73,7 @@ const deactivateUserController = async (
   const userId: number = parseInt(req.params.id);
 
   const userData = await deleteUsersService(userId);
+
   return res.status(204).json(userData);
 };
 

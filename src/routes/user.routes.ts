@@ -42,7 +42,6 @@ userRoutes.patch(
   ensureBodyIsValidMiddleware(updateUserSchema),
   ensureTokenIsValidMiddleware,
   ensureUserExistsMiddleware,
-  ensureEmailNotExistsMiddleware,
   updateUsersController
 );
 
@@ -50,6 +49,7 @@ userRoutes.delete(
   "/:id",
   ensureTokenIsValidMiddleware,
   ensureUserExistsMiddleware,
+  // ensureAdminExistsMiddleware,
   deactivateUserController
 );
 
