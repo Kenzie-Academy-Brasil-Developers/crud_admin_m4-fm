@@ -1,62 +1,34 @@
 import format from "pg-format";
-import { TUserResponse, TUserUpdated } from "../../interfaces/users.interface";
-import {
-  responseUserSchema,
-  updateUserSchema,
-} from "../../schemas/users.schema";
-import { QueryConfig, QueryResult } from "pg";
+import { TUserUpdated } from "../../interfaces/users.interface";
+import { responseUserSchema } from "../../schemas/users.schema";
 import { client } from "../../database";
+import { QueryConfig } from "pg";
 
-const updateUsersService = async (
-  userData: TUserUpdated,
-  id: number
-): Promise<TUserResponse> => {
-  const validateBody = userData;
-
-  const queryString: string = format(
+const updateUsersService = async (id: number, userData: TUserUpdated) => {
+  const queryTemplate = format(
     `
-      UPDATE 
-          users
-        SET(%I) = ROW(%L)
-      WHERE
-          id = $1
-      RETURNING *
-    `,
-    Object.keys(validateBody),
-    Object.values(validateBody)
+        UPDATE 
+            users
+        SET 
+            (%I) = ROW (%L)
+        WHERE
+            id = $1
+        RETURNING *;
+        `,
+    Object.keys(userData),
+    Object.values(userData)
   );
 
-  let queryConfig: QueryConfig = {
-    text: queryString,
-    values: [id],
-  };
-
-  const queryResultToUpdate: QueryResult<TUserResponse> = await client.query(
-    queryConfig
-  );
-  updateUserSchema.parse(queryResultToUpdate);
-
-  const queryTemplate: string = `
-            SELECT
-              *
-            FROM
-              users
-            WHERE
-              id = $1
-        `;
-  queryConfig = {
+  const queryConfig: QueryConfig = {
     text: queryTemplate,
     values: [id],
   };
-  const queryResult: QueryResult<TUserResponse> = await client.query(
-    queryConfig
-  );
 
-  const updateUser: TUserResponse = responseUserSchema.parse(
-    queryResult.rows[0]
-  );
+  const queryResultTemplate = await client.query(queryConfig);
 
-  return updateUser;
+  const updatedUser = responseUserSchema.parse(queryResultTemplate.rows[0]);
+
+  return updatedUser;
 };
 
 export default updateUsersService;
