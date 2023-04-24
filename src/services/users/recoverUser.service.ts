@@ -7,28 +7,6 @@ import { AppError } from "../../error";
 const recoverUserService = async (userId: number): Promise<TUserResponse> => {
   const id: number = userId;
 
-  // const queryStringTemplate: string = `
-  //       SELECT
-  //           *
-  //       FROM
-  //           users
-  //       WHERE
-  //           id = $1;
-  //  `;
-  // const queryConfigTemplate: QueryConfig = {
-  //   text: queryStringTemplate,
-  //   values: [userId],
-  // };
-  // const queryResultTemplate: QueryResult<TUserResponse> = await client.query(
-  //   queryConfigTemplate
-  // );
-
-  // const userTemplate = queryResultTemplate.rows[0];
-
-  // if (userTemplate.active === true) {
-  //   throw new AppError("User already active", 400);
-  // }
-
   const queryString: string = `
     UPDATE
         users
