@@ -4,7 +4,7 @@ import { client } from "../database";
 import { TUser, TUserResponse } from "../interfaces/users.interface";
 import { AppError } from "../error";
 
-const ensureUserExistsMiddleware = async (
+const ensureUserIsActiveMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -27,11 +27,13 @@ const ensureUserExistsMiddleware = async (
     queryConfig
   );
 
-  if (queryResult.rowCount === 0) {
-    throw new AppError("User not found", 404);
+  const user = queryResult.rows[0];
+
+  if (user.active === true) {
+    throw new AppError("User already active", 400);
   }
 
   return next();
 };
 
-export default ensureUserExistsMiddleware;
+export default ensureUserIsActiveMiddleware;

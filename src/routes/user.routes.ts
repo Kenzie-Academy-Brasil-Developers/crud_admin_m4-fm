@@ -13,7 +13,8 @@ import ensureBodyIsValidMiddleware from "../middlewares/ensureBodyIsValid.middle
 import { requestUserSchema, updateUserSchema } from "../schemas/users.schema";
 import ensureTokenIsValidMiddleware from "../middlewares/ensureTokenIsValid.middleware";
 import ensureAdminExistsMiddleware from "../middlewares/ensureAdminExists.middleware";
-import deleteUsersService from "../services/users/deleteUsers.service";
+import ensureItIsAdminOrOwnerMiddleware from "../middlewares/ensureIfItIsAdminOrOwner.middleware";
+import ensureUserIsActiveMiddleware from "../middlewares/ensureUserIsActive.middleware";
 
 const userRoutes: Router = Router();
 
@@ -39,10 +40,11 @@ userRoutes.get(
 
 userRoutes.patch(
   "/:id",
-  ensureBodyIsValidMiddleware(updateUserSchema),
   ensureTokenIsValidMiddleware,
   ensureUserExistsMiddleware,
-  ensureAdminExistsMiddleware,
+  ensureItIsAdminOrOwnerMiddleware,
+  ensureBodyIsValidMiddleware(updateUserSchema),
+  ensureEmailNotExistsMiddleware,
   updateUsersController
 );
 
@@ -50,7 +52,7 @@ userRoutes.delete(
   "/:id",
   ensureTokenIsValidMiddleware,
   ensureUserExistsMiddleware,
-  ensureAdminExistsMiddleware,
+  ensureItIsAdminOrOwnerMiddleware,
   deactivateUserController
 );
 
@@ -58,6 +60,7 @@ userRoutes.put(
   "/:id/recover",
   ensureTokenIsValidMiddleware,
   ensureAdminExistsMiddleware,
+  ensureUserIsActiveMiddleware,
   recoverUserController
 );
 

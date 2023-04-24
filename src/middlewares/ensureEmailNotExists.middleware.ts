@@ -9,6 +9,11 @@ const ensureEmailNotExistsMiddleware = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { email } = req.body;
+
+  if (req.method === "PATCH" && !req.body.email) {
+    return next();
+  }
+
   const queryString: string = `
         SELECT
             *

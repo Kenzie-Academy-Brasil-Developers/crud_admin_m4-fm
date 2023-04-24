@@ -31,6 +31,10 @@ const createLoginService = async (payload: TLoginRequest): Promise<string> => {
     throw new AppError("Wrong email/password", 401);
   }
 
+  if (!userExist.active) {
+    throw new AppError("Wrong email/password", 401);
+  }
+
   const comparePassword: boolean = await bcrypt.compare(
     payload.password,
     userExist.password
